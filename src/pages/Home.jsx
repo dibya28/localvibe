@@ -21,46 +21,46 @@ export default function Home() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-6">
-      {/* Page header */}
-      <div className="flex items-center justify-between mb-5">
+    <div className="max-w-2xl mx-auto px-4 py-8">
+
+      {/* Header */}
+      <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-xl font-bold text-gray-900">Community Feed</h1>
-          <p className="text-sm text-gray-400">
-            {selectedCity ? `Posts in ${selectedCity}` : 'All neighborhoods'}
+          <h1 className="text-base font-semibold text-gray-900">Community Feed</h1>
+          <p className="text-xs text-gray-400 mt-0.5">
+            {selectedCity ? selectedCity : 'All neighborhoods'}
             {selectedCategory ? ` · ${selectedCategory}` : ''}
           </p>
         </div>
         <button
           onClick={() => setShowCreate((v) => !v)}
-          className={`flex items-center gap-1.5 font-semibold px-4 py-2 rounded-xl text-sm transition-all duration-200 shadow-sm ${
+          className={`text-sm font-medium px-3.5 py-1.5 rounded-lg transition-colors ${
             showCreate
               ? 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              : 'bg-green-500 hover:bg-green-600 text-white shadow-green-200'
+              : 'bg-gray-900 text-white hover:bg-gray-700'
           }`}
         >
-          <span className="text-base leading-none">{showCreate ? '×' : '+'}</span>
-          {showCreate ? 'Close' : 'New Post'}
+          {showCreate ? 'Cancel' : '+ New post'}
         </button>
       </div>
 
       {/* Create post */}
       {showCreate && (
-        <div className="mb-5 animate-fade-in">
+        <div className="mb-6">
           <CreatePost onClose={() => setShowCreate(false)} />
         </div>
       )}
 
       {/* Filters */}
-      <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 mb-5">
-        {/* Category pills */}
-        <div className="flex flex-wrap gap-1.5 mb-3">
+      <div className="mb-5">
+        {/* Category tabs */}
+        <div className="flex items-center gap-1 overflow-x-auto pb-1 scrollbar-none">
           <button
             onClick={() => setSelectedCategory('')}
-            className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${
+            className={`shrink-0 px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
               !selectedCategory
                 ? 'bg-gray-900 text-white'
-                : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
             }`}
           >
             All
@@ -69,10 +69,10 @@ export default function Home() {
             <button
               key={cat}
               onClick={() => setSelectedCategory(selectedCategory === cat ? '' : cat)}
-              className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${
+              className={`shrink-0 px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
                 selectedCategory === cat
-                  ? 'bg-green-500 text-white shadow-sm'
-                  : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                  ? 'bg-gray-900 text-white'
+                  : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
               }`}
             >
               {cat}
@@ -81,17 +81,17 @@ export default function Home() {
         </div>
 
         {/* City filter */}
-        <form onSubmit={handleCityFilter} className="flex gap-2">
+        <form onSubmit={handleCityFilter} className="flex gap-2 mt-2">
           <input
             type="text"
             value={cityInput}
             onChange={(e) => setCityInput(e.target.value)}
-            placeholder="Filter by city (e.g. Mumbai, Delhi…)"
-            className="flex-1 text-sm border border-gray-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent placeholder:text-gray-300"
+            placeholder="Filter by city…"
+            className="flex-1 text-xs border border-gray-200 rounded-lg px-3 py-1.5 bg-white focus:outline-none focus:ring-1 focus:ring-gray-300 placeholder:text-gray-300"
           />
           <button
             type="submit"
-            className="bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap"
+            className="text-xs font-medium px-3 py-1.5 border border-gray-200 rounded-lg text-gray-600 hover:bg-gray-50 transition-colors"
           >
             Apply
           </button>
@@ -99,7 +99,7 @@ export default function Home() {
             <button
               type="button"
               onClick={clearCity}
-              className="bg-red-50 hover:bg-red-100 text-red-500 text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors"
+              className="text-xs font-medium px-3 py-1.5 text-gray-400 hover:text-gray-600 transition-colors"
             >
               Clear
             </button>

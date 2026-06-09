@@ -12,26 +12,9 @@ function timeAgo(timestamp) {
   const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp)
   const diff = (Date.now() - date.getTime()) / 1000
   if (diff < 60) return 'just now'
-  if (diff < 3600) return `${Math.floor(diff / 60)}m ago`
-  if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`
+  if (diff < 3600) return `${Math.floor(diff / 60)}m`
+  if (diff < 86400) return `${Math.floor(diff / 3600)}h`
   return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-}
-
-function avatarFallback(name) {
-  return `https://ui-avatars.com/api/?name=${encodeURIComponent(name || 'U')}&background=22c55e&color=fff&size=32`
-}
-
-function CommentSkeleton() {
-  return (
-    <div className="flex gap-2 animate-pulse">
-      <div className="w-7 h-7 rounded-full bg-gray-200 shrink-0" />
-      <div className="flex-1 bg-white border border-gray-100 rounded-xl p-2.5">
-        <div className="h-3 bg-gray-200 rounded w-24 mb-1.5" />
-        <div className="h-2.5 bg-gray-100 rounded w-full" />
-        <div className="h-2.5 bg-gray-100 rounded w-4/5 mt-1" />
-      </div>
-    </div>
-  )
 }
 
 export default function CommentSection({ postId }) {
@@ -42,18 +25,11 @@ export default function CommentSection({ postId }) {
   const [submitting, setSubmitting] = useState(false)
 
   useEffect(() => {
-    const q = query(
-      collection(db, 'posts', postId, 'comments'),
-      orderBy('createdAt', 'asc')
-    )
-    const unsub = onSnapshot(
-      q,
-      (snap) => {
-        setComments(snap.docs.map((d) => ({ id: d.id, ...d.data() })))
-        setLoading(false)
-      },
-      () => setLoading(false)
-    )
+    const q = query(collection(db, 'posts', postId, 'comments'), orderBy('createdAt', 'asc'))
+    const unsub = onSnapshot(q, (snap) => {
+      setComments(snap.docs.map((d) => ({ id: d.id, ...d.data() })))
+      setLoading(false)
+    }, () => setLoading(false))
     return unsub
   }, [postId])
 
@@ -61,7 +37,6 @@ export default function CommentSection({ postId }) {
     e.preventDefault()
     const body = text.trim()
     if (!body || submitting) return
-
     setSubmitting(true)
     try {
       await addDoc(collection(db, 'posts', postId, 'comments'), {
@@ -71,9 +46,7 @@ export default function CommentSection({ postId }) {
         authorPhoto: user.photoURL,
         createdAt: serverTimestamp(),
       })
-      await updateDoc(doc(db, 'posts', postId), {
-        commentCount: increment(1),
-      })
+      await updateDoc(doc(db, 'posts', postId), { commentCount: increment(1) })
       setText('')
     } catch {
       toast.error('Failed to post comment')
@@ -84,56 +57,61 @@ export default function CommentSection({ postId }) {
 
   return (
     <div>
-      {/* Comment list */}
       {loading ? (
-        <div className="space-y-3 mb-4">
-          <CommentSkeleton />
-          <CommentSkeleton />
+        <div className="space-y-2.5 mb-3 animate-pulse">
+          {[0, 1].map((i) => (
+            <div key={i} className="flex gap-2">
+              <div className="w-6 h-6 rounded-full bg-gray-200 shrink-0" />
+              <div className="flex-1 bg-white border border-gray-100 rounded-lg p-2.5">
+                <div className="h-2.5 bg-gray-100 rounded w-24 mb-1.5" />
+                <div className="h-2.5 bg-gray-50 rounded w-3/4" />
+              </div>
+            </div>
+          ))}
         </div>
       ) : comments.length === 0 ? (
-        <p className="text-sm text-gray-400 py-1 mb-3">No comments yet. Be the first!</p>
+        <p className="text-xs text-gray-300 mb-3">No comments yet.</p>
       ) : (
-        <div className="space-y-2.5 mb-4">
+        <div className="space-y-2 mb-3">
           {comments.map((c) => (
-            <div key={c.id} className="flex gap-2.5 animate-fade-in">
+            <div key={c.id} className="flex gap-2">
               <img
-                src={c.authorPhoto || avatarFallback(c.authorName)}
+                src={c.authorPhoto || `https://ui-avatars.com/api/?name=${encodeURIComponent(c.authorName || 'U')}&size=24&background=f3f4f6&color=374151`}
                 alt={c.authorName}
-                className="w-7 h-7 rounded-full object-cover shrink-0 mt-0.5"
+                className="w-6 h-6 rounded-full object-cover shrink-0 mt-0.5"
               />
-              <div className="bg-white rounded-xl px-3 py-2 flex-1 border border-gray-100 shadow-sm">
+              <div className="bg-white border border-gray-100 rounded-lg px-3 py-2 flex-1">
                 <div className="flex items-baseline gap-2 mb-0.5">
-                  <span className="text-xs font-semibold text-gray-800">{c.authorName}</span>
-                  <span className="text-xs text-gray-400">{timeAgo(c.createdAt)}</span>
+                  <span className="text-xs font-medium text-gray-700">{c.authorName}</span>
+                  <span className="text-xs text-gray-300">{timeAgo(c.createdAt)}</span>
                 </div>
-                <p className="text-sm text-gray-700 leading-relaxed">{c.body}</p>
+                <p className="text-xs text-gray-600 leading-relaxed">{c.body}</p>
               </div>
             </div>
           ))}
         </div>
       )}
 
-      {/* Comment input */}
-      <form onSubmit={handleSubmit} className="flex gap-2 items-center">
+      <form onSubmit={handleSubmit} className="flex gap-2">
         <img
-          src={user?.photoURL || avatarFallback(user?.displayName)}
+          src={user?.photoURL}
           alt={user?.displayName}
-          className="w-7 h-7 rounded-full object-cover shrink-0"
+          className="w-6 h-6 rounded-full object-cover shrink-0 mt-0.5"
         />
         <input
           type="text"
           value={text}
           onChange={(e) => setText(e.target.value)}
-          placeholder="Write a comment…"
+          placeholder="Add a comment…"
           maxLength={1000}
-          className="flex-1 text-sm border border-gray-200 bg-white rounded-xl px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent placeholder:text-gray-300"
+          className="flex-1 text-xs border border-gray-200 bg-white rounded-lg px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-gray-300 placeholder:text-gray-300"
         />
         <button
           type="submit"
           disabled={submitting || !text.trim()}
-          className="bg-green-500 hover:bg-green-600 disabled:bg-green-200 text-white text-xs font-semibold px-3 py-1.5 rounded-xl transition-colors shrink-0"
+          className="text-xs font-medium px-3 py-1.5 bg-gray-900 hover:bg-gray-700 disabled:bg-gray-200 disabled:text-gray-400 text-white rounded-lg transition-colors"
         >
-          {submitting ? '…' : 'Send'}
+          Send
         </button>
       </form>
     </div>
