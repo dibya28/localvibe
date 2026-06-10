@@ -11,7 +11,7 @@ export default function Navbar() {
     <nav className="bg-white border-b border-gray-100 sticky top-0 z-40">
       <div className="max-w-2xl mx-auto px-4 h-14 flex items-center justify-between">
         <Link to="/" className="font-semibold text-gray-900 tracking-tight text-sm">
-          LocalVibe
+          Stackup
         </Link>
 
         <div className="flex items-center gap-6">

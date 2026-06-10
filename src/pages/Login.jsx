@@ -19,7 +19,7 @@ export default function Login() {
 
         <div className="mb-12">
           <div className="w-8 h-8 bg-green-600 rounded-lg mb-8" />
-          <h1 className="text-2xl font-semibold text-gray-900 mb-2">LocalVibe</h1>
+          <h1 className="text-2xl font-semibold text-gray-900 mb-2">Stackup</h1>
           <p className="text-gray-400 text-sm leading-relaxed">
             A hyperlocal community board for events, deals,<br />
             skills, and everything in between.
